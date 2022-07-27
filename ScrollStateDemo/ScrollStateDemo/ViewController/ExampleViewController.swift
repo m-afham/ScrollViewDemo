@@ -9,7 +9,9 @@ import UIKit
 
 class ExampleViewController: UIViewController {
     
+    // MARK: - Properties
     
+    /// ScrollView
     lazy var imageScrollView: UIScrollView = {
         let sv = UIScrollView.init()
         sv.translatesAutoresizingMaskIntoConstraints = false
@@ -24,6 +26,7 @@ class ExampleViewController: UIViewController {
         return sv
     }()
     
+    /// ImageView
     lazy var imageView: UIImageView = {
         let iv = UIImageView()
         iv.image = .init(named: "Lifetime")
@@ -31,6 +34,7 @@ class ExampleViewController: UIViewController {
         return iv
     }()
     
+    /// Background Image View ( Blurred )
     lazy var backgroundBlurredImageView: UIImageView = {
         let iv = UIImageView()
         iv.image = .init(named: "Lifetime")
@@ -40,9 +44,7 @@ class ExampleViewController: UIViewController {
         return iv
     }()
     
-    @IBAction func handleSave(_ sender: Any) {
-        saveState()
-    }
+    // MARK: - VC Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -51,21 +53,23 @@ class ExampleViewController: UIViewController {
         restoreState()
     }
     
-    func addScrollView() {
-        imageScrollView.addSubview(imageView)
-        imageView.frame = imageScrollView.bounds
-        self.view.addSubview(imageScrollView)
+    // MARK: - IBActions
+    
+    @IBAction func handleSave(_ sender: Any) {
+        saveState()
     }
+}
 
-    
-    func addBlurBackgroundImageView() {
-        self.view.addSubview(backgroundBlurredImageView)
-        backgroundBlurredImageView.layer.zPosition = -1
+// MARK: - ScrollView Delegate
+extension ExampleViewController: UIScrollViewDelegate {
+    func viewForZooming(in scrollView: UIScrollView) -> UIView? {
+        self.imageView
     }
+}
 
-    
-    
-    func restoreState() {
+// MARK: - ScrollView State Save/Restore Methods
+extension ExampleViewController {
+   func restoreState() {
         guard let zoomScale = UserDefaults.zoomScale,
               let contentOffset = UserDefaults.contentOffset else {
             return
@@ -80,12 +84,21 @@ class ExampleViewController: UIViewController {
     }
 }
 
-extension ExampleViewController: UIScrollViewDelegate {
-    func viewForZooming(in scrollView: UIScrollView) -> UIView? {
-        self.imageView
+// MARK: - UI Setup Methods
+extension ExampleViewController {
+    func addScrollView() {
+        imageScrollView.addSubview(imageView)
+        imageView.frame = imageScrollView.bounds
+        self.view.addSubview(imageScrollView)
+    }
+
+    func addBlurBackgroundImageView() {
+        self.view.addSubview(backgroundBlurredImageView)
+        backgroundBlurredImageView.layer.zPosition = -1
     }
 }
 
+// MARK: - Userdefaults
 extension UserDefaults {
     static var zoomScale: CGFloat? {
         get {
@@ -110,6 +123,7 @@ extension UserDefaults {
     }
 }
 
+// MARK: - UIImageView Blur Helping Method
 extension UIImageView {
     func applyBlurEffect() {
         let blurEffect = UIBlurEffect(style: .light)
